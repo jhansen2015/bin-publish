@@ -1,5 +1,23 @@
 #!/bin/bash
 
+##########################################################################
+#
+# Copyright 2018 Joshua Hansen
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+##########################################################################
+
 #
 # If there is no mktemp; give up.
 # Make sure we clean up files when we are done.
@@ -128,3 +146,4 @@ fi
 # Clean up after ourselves.
 unset -f edit_path_d5b29c18024c4e1489bb971f0ddf5a6f
 unset -f show_path_parts_d5b29c18024c4e1489bb971f0ddf5a6f
+
