@@ -20,7 +20,8 @@
 
 if [[ "$1" == "--help" ]]
 then
-	echo "USAGE: $0 [--help]
+	echo "USAGE: `basename "$0"` [--help]
+v1.0
 
 Features:
 * Invokes 'difftool --dir-diff --no-symlinks --cached'
