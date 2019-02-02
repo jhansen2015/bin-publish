@@ -14,7 +14,7 @@ $ chmod +x bin-publish/*.sh
 
 Then, add the `~/bin-publish` directory to your path in `.bash_profile` or `.bashrc`.
 
-# License
+## License
 
 All code is licensed Apache license 2.0, unless otherwise indicated.
 
