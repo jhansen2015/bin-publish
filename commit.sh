@@ -85,6 +85,7 @@ fi
 
 if [[ ! -s "$GIT_LOG" ]]
 then
+	LINE_NO=1
 	echo "" > "$GIT_LOG"
 fi
 
@@ -115,8 +116,16 @@ $REMOVE_LINE
 
 } | sed 's/^/# /' >> "$GIT_LOG"
 
-# TODO: syntax gitcommit
-vim -c 'set syntax=gitcommit' "$GIT_LOG"
+# TODO: Allow other editors
+# Start at line 1 and set syntax to gitcommit
+VIM_ARGS=( \
+	'-c' 'set syntax=gitcommit'
+)
+if [[ -v LINE_NO ]]
+then
+	VIM_ARGS+=( "+$LINE_NO" )
+fi
+vim "${VIM_ARGS[@]}" "$GIT_LOG"
 
 # Wait for difftool to complete
 # Ideally, we would kill the process, but there are several subprocesses,
