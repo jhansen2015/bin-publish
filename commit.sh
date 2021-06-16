@@ -2,7 +2,7 @@
 
 ##########################################################################
 #
-# Copyright 2018-2019 Joshua Hansen
+# Copyright 2018-2020 Joshua Hansen
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,11 +17,17 @@
 # limitations under the License.
 #
 ##########################################################################
+# v1.1
+# * Support git scissors format; git config --global commit.cleanup scissors
+# * Set branch name as first word of file, unless it is master or main
+# * Remove empty lines from the end of the message before editing
+# 
+##########################################################################
 
 if [[ "$1" == "--help" ]]
 then
 	echo "USAGE: `basename "$0"` [--help]
-v1.0
+v1.1
 
 Features:
 * Invokes 'difftool --dir-diff --no-symlinks --cached'
@@ -31,6 +37,7 @@ Features:
 * Cancels if changes are detected to 'git status', 'git status --porcelain=2', staged, or unstaged files.
 * Worktree aware
 * Removes commit message file on successful commit
+# Set branch name as first word of file, unless it is master or main
 
 Options
 --help   Prints this message
@@ -95,18 +102,36 @@ fi
 OLD_HASH="$(computeHash)"
 
 # Delete comments/ info from previous execution
-sed -i '/^#/d' "$GIT_LOG"
+REMOVE_LINE="# REMOVE THIS LINE TO COMMIT"
+sed -i "/^$REMOVE_LINE/d" "$GIT_LOG"
+sed -i '/^# ------------------------ >8 ------------------------/,$d' "$GIT_LOG"
 
-# Check if the last line in empty; if not, add a carriage return
-if [[ ! -z "`tail -n 1 "$GIT_LOG"`" ]]
+# Remove trailing new lines
+sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' "$GIT_LOG"
+
+# Add a blank line
+echo "" >> "$GIT_LOG"
+
+BRANCH_NAME="`git branch --show-current`"
+if [[ "master" != "$BRANCH_NAME" && "main" != "$BRANCH_NAME" ]]
 then
-	echo "" >> "$GIT_LOG"
+  # Remove the first word of the file, and insert the branch name
+  sed -i -e '1s/^\S\+\s\?//; 1s/^/'"$BRANCH_NAME"' /' "$GIT_LOG"
 fi
 
-REMOVE_LINE="# REMOVE THIS LINE TO COMMIT"
-echo "#
-$REMOVE_LINE
+# Add a blank line to the end of the file
+if [[ ! -z "`tail -n 1 "$GIT_LOG"`" ]]
+then
+       echo "" >> "$GIT_LOG"
+fi
+
+# Use "git commit --scissors" style comment handling
+echo "$REMOVE_LINE
+# ------------------------ >8 ------------------------
+# Do not modify or remove the line above.
+# Everything below it will be ignored.
 #" >> $GIT_LOG
+
 
 {
 	git status
@@ -143,7 +168,7 @@ then
 fi
 
 # Delete comments/ info before actual commit
-sed -i '/^#/d' "$GIT_LOG"
+sed -i '/^# ------------------------ >8 ------------------------/,$d' "$GIT_LOG"
 
 # Check the hash
 NEW_HASH="$(computeHash)"
